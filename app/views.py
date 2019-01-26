@@ -125,14 +125,23 @@ class GeoNamesModelView(ModelView):
     datamodel = SQLAInterface(GeoNames)
     label_columns = {
         'geoname' : 'Name',
-        'name_translation_ru' : 'Translation',
-        'motivation_types.motivation_short_name_ru' : 'Motivation',
-        'motivation_comment' : 'Comment'
+        'name_translation_ru' : 'Translation (Russian)',
+        'name_translation_en': 'Translation (English)',
+        'motivation_types.motivation_short_name_ru' : 'Motivation (Russian)',
+        'motivation_types.motivation_short_name_en': 'Motivation (English)',
+        'motivation_comment' : 'Comment',
+        'geo_objects.area_name_ru': 'Area it belongs to (Russian)',
+        'geo_objects.area_name_en': 'Area it belongs to (English)',
+
     }
     list_columns = ['geoname',
                     'name_translation_ru',
+                    'name_translation_en',
                     'motivation_types.motivation_short_name_ru',
+                    'motivation_types.motivation_short_name_en',
                     'motivation_comment',
+                    'geo_objects.area_name_ru',
+                    'geo_objects.area_name_en'
                     ]
 
     show_fieldsets = [
@@ -140,6 +149,7 @@ class GeoNamesModelView(ModelView):
                             'Summary',
                             {'fields' : ['geoname',
                                          'name_translation_ru',
+                                         'name_translation_en',
                                          'motivation_comment',
                                          'linguistic_means',
                                        'languages',
@@ -155,6 +165,7 @@ class GeoNamesModelView(ModelView):
             'Summary',
             {'fields': ['geoname',
                         'name_translation_ru',
+                        'name_translation_en',
                         'motivation_comment',
                         'linguistic_means',
                         'languages',
@@ -171,6 +182,7 @@ class GeoNamesModelView(ModelView):
             'Summary',
             {'fields': ['geoname',
                         'name_translation_ru',
+                        'name_translation_en',
                         'motivation_comment',
                         'linguistic_means',
                         'languages',
@@ -186,7 +198,16 @@ class GeoObjectsModelView(ModelView):
     datamodel = SQLAInterface(GeoObjects)
     related_views = [GeoNamesModelView]
 
-    list_columns = ['latitude', 'longitude', 'osm_id', 'geo_types.geotype_ru', 'geo_types.geotype_en']
+    label_columns = {'latitude': 'Latitude',
+                     'longitude': 'Longitude',
+                     'osm_id' : 'Object id in OpenStreetMap',
+                     'geo_types.geotype_ru': 'Type (Russian)',
+                     'geo_types.geotype_en': 'Type (English)',
+                     'area_name_ru' : 'The area which it belongs to (Russian)',
+                     'area_name_en' : 'The area which it belongs to (English)'
+                     }
+    list_columns = ['latitude', 'longitude', 'osm_id', 'geo_types.geotype_ru', 'geo_types.geotype_en',
+                    'area_name_ru', 'area_name_en']
     base_order = ('latitude', 'asc')
 
     show_fieldsets = [
@@ -195,7 +216,9 @@ class GeoObjectsModelView(ModelView):
                             {'fields' : ['latitude',
                                        'longitude',
                                        'osm_id'
-                                       'geo_types'
+                                       'geo_types',
+                                        'area_name_en',
+                                         'area_name_ru'
                              ]}
                         ),
 
@@ -206,7 +229,9 @@ class GeoObjectsModelView(ModelView):
             {'fields': ['latitude',
                         'longitude',
                         'osm_id',
-                        'geo_types']}
+                        'geo_types',
+                        'area_name_en',
+                        'area_name_ru']}
         ),
 
     ]
@@ -217,7 +242,10 @@ class GeoObjectsModelView(ModelView):
             {'fields': ['latitude',
                         'longitude',
                         'osm_id',
-                        'geo_types']}
+                        'geo_types',
+                        'area_name_en',
+                        'area_name_ru'
+                        ]}
         ),
 
     ]
@@ -267,6 +295,25 @@ class GeoTypesModelView(ModelView):
                      ]
 
 
+from flask_appbuilder.charts.views import DirectByChartView
+from flask_appbuilder.models.sqla.interface import SQLAInterface
+from flask_appbuilder.models.group import aggregate_count
+
+
+class GeoNamesDirectChartView(DirectByChartView):
+    datamodel = SQLAInterface(GeoNames)
+    chart_title = 'Geo Names'
+    #chart_type = 'PieChart'
+
+    definitions = [
+        {
+            'group': 'motivation_types.motivation_short_name_ru',
+            'series': [(aggregate_count, 'motivation_types.motivation_short_name_ru')]
+        },
+
+    ]
+
+
 
 db.create_all()
 
@@ -304,6 +351,9 @@ appbuilder.add_view(GeoNamesModelView,
                     category = "Geo",
 )
 
-
+appbuilder.add_view(GeoNamesDirectChartView,
+                    "Geo names chart",
+                    icon="fa-dashboard",
+                    category="Geo")
 
 

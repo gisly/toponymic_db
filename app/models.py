@@ -3,15 +3,16 @@ from flask_appbuilder.models.mixins import AuditMixin, FileColumn, ImageColumn
 from sqlalchemy import Column, Integer, String, ForeignKey, Numeric
 from sqlalchemy.orm import relationship
 
+
 class Languages(Model):
     language_id = Column(Integer, primary_key=True)
-    language_iso = Column(String(100), unique = True, nullable=False)
-    language_name_ru = Column(String(100), unique = True, nullable=False)
-    language_name_en = Column(String(100), unique = True, nullable=False)
-
+    language_iso = Column(String(100), unique=True, nullable=False)
+    language_name_ru = Column(String(100), unique=True, nullable=False)
+    language_name_en = Column(String(100), unique=True, nullable=False)
 
     def __repr__(self):
         return self.language_iso
+
 
 class SourceReferences(Model):
     source_id = Column(Integer, primary_key=True)
@@ -31,6 +32,7 @@ class MotivationTypes(Model):
     def __repr__(self):
         return self.motivation_short_name_ru
 
+
 class GeoTypes(Model):
     geotype_id = Column(Integer, primary_key=True)
     geotype_ru = Column(String(100), unique=True, nullable=False)
@@ -47,11 +49,13 @@ class GeoObjects(Model):
     latitude = Column(Numeric, unique=False, nullable=False)
     longitude = Column(Numeric, unique=False, nullable=False)
     osm_id = Column(Integer, primary_key=False, unique=True, nullable=False)
+    area_name_ru = Column(String(100), unique=False, nullable=True)
+    area_name_en = Column(String(100), unique=False, nullable=True)
     geotype_id = Column(Integer, ForeignKey("geo_types.geotype_id"), nullable=False)
     geo_types = relationship("GeoTypes")
 
     def __repr__(self):
-        return str(self.osm_id)
+        return '%s:%s (%s;%s)' % (self.latitude, self.longitude, self.osm_id, self.area_name_en)
 
 
 class GeoNames(Model):
@@ -70,11 +74,9 @@ class GeoNames(Model):
 
     source_references = relationship("SourceReferences")
     source_id = Column(Integer, ForeignKey("source_references.source_id"), nullable=False)
+
     motivation_types = relationship("MotivationTypes")
     motivation_id = Column(Integer, ForeignKey("motivation_types.motivation_id"), nullable=False)
 
     def __repr__(self):
         return self.geoname
-
-
-
