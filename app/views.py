@@ -1,4 +1,5 @@
 from flask import render_template
+from flask_appbuilder.models.generic.filters import FilterStartsWith
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder import ModelView
 from app import appbuilder, db
@@ -134,12 +135,14 @@ class GeoNamesModelView(ModelView):
         'geo_objects.area_name_en': 'Area it belongs to (English)',
 
     }
+    #search_form_query_rel_fields = {'group':[['name',FilterStartsWith,'W']]}
+
     list_columns = ['geoname',
                     'name_translation_ru',
                     'name_translation_en',
                     'motivation_types.motivation_short_name_ru',
                     'motivation_types.motivation_short_name_en',
-                    'motivation_comment',
+                    'motivation_types.motivation_comment',
                     'geo_objects.area_name_ru',
                     'geo_objects.area_name_en'
                     ]
@@ -153,7 +156,8 @@ class GeoNamesModelView(ModelView):
                                          'motivation_comment',
                                          'linguistic_means',
                                        'languages',
-                                       'geo_objects',
+                                       'geo_objects.area_name_ru',
+                                    'geo_objects.area_name_en',
                                        'source_references',
                                     'motivation_types'
                              ]}
@@ -262,6 +266,8 @@ class GeoTypesModelView(ModelView):
     list_columns = ['geotype_ru', 'geotype_en', 'geotype_description_ru', 'geotype_description_en',]
 
 
+
+
     show_fieldsets = [
                         (
                             'Summary',
@@ -295,22 +301,26 @@ class GeoTypesModelView(ModelView):
                      ]
 
 
-from flask_appbuilder.charts.views import DirectByChartView
+from flask_appbuilder.charts.views import DirectByChartView, GroupByChartView
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder.models.group import aggregate_count
 
 
-class GeoNamesDirectChartView(DirectByChartView):
+class GeoNamesDirectChartView(GroupByChartView):
     datamodel = SQLAInterface(GeoNames)
     chart_title = 'Geo Names'
-    #chart_type = 'PieChart'
+    label_columns = GeoNamesModelView.label_columns
+    chart_type = 'PieChart'
 
     definitions = [
         {
-            'group': 'motivation_types.motivation_short_name_ru',
-            'series': [(aggregate_count, 'motivation_types.motivation_short_name_ru')]
+            'group': 'motivation_types',
+            'series': [(aggregate_count, 'motivation_types')]
         },
-
+        {
+            'group': 'geo_objects.area_name_ru',
+            'series': [(aggregate_count, 'geo_objects.area_name_ru')]
+        },
     ]
 
 
