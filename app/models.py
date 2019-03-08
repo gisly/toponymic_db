@@ -32,6 +32,9 @@ class MotivationTypes(Model):
     def __repr__(self):
         return self.motivation_short_name_ru
 
+    def __lt__(self, other):
+        return self.motivation_short_name_ru < other.motivation_short_name_ru
+
 
 class GeoTypes(Model):
     geotype_id = Column(Integer, primary_key=True)
@@ -48,9 +51,9 @@ class GeoObjects(Model):
     geoobject_id = Column(Integer, primary_key=True)
     latitude = Column(Numeric, unique=False, nullable=False)
     longitude = Column(Numeric, unique=False, nullable=False)
-    osm_id = Column(Integer, primary_key=False, unique=True, nullable=False)
-    area_name_ru = Column(String(100), unique=False, nullable=True)
-    area_name_en = Column(String(100), unique=False, nullable=True)
+    osm_id = Column(Integer, primary_key=False, unique=False, nullable=False)
+    area_name_ru = Column(String(1000), unique=False, nullable=True)
+    area_name_en = Column(String(1000), unique=False, nullable=True)
     geotype_id = Column(Integer, ForeignKey("geo_types.geotype_id"), nullable=False)
     geo_types = relationship("GeoTypes")
 
