@@ -323,6 +323,23 @@ class GeoNamesDirectChartView(GroupByChartView):
         },
     ]
 
+class GeoNamesDirectBarChartView(GroupByChartView):
+    datamodel = SQLAInterface(GeoNames)
+    chart_title = 'Geo Names (bar chart)'
+    label_columns = GeoNamesModelView.label_columns
+    chart_type = 'BarChart'
+
+    definitions = [
+        {
+            'group': 'motivation_types',
+            'series': [(aggregate_count, 'motivation_types')]
+        },
+        {
+            'group': 'geo_objects.area_name_ru',
+            'series': [(aggregate_count, 'geo_objects.area_name_ru')]
+        },
+    ]
+
 
 
 db.create_all()
@@ -366,4 +383,8 @@ appbuilder.add_view(GeoNamesDirectChartView,
                     icon="fa-dashboard",
                     category="Geo")
 
+appbuilder.add_view(GeoNamesDirectBarChartView,
+                    "Geo names chart (bar chart)",
+                    icon="fa-dashboard",
+                    category="Geo")
 
