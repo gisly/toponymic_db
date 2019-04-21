@@ -52,15 +52,13 @@ class GeoObjects(Model):
     latitude = Column(Numeric, unique=False, nullable=False)
     longitude = Column(Numeric, unique=False, nullable=False)
     osm_id = Column(Integer, primary_key=False, unique=False, nullable=False)
-    #area_name_ru = Column(String(1000), unique=False, nullable=True)
-    #area_name_en = Column(String(1000), unique=False, nullable=True)
     geotype_id = Column(Integer, ForeignKey("geo_types.geotype_id"), nullable=False)
     geo_types = relationship("GeoTypes")
     map_id = Column(Integer, ForeignKey("maps.map_id"), nullable=True)
     maps = relationship("Maps")
 
     def __repr__(self):
-        return '%s:%s (%s;%s)' % (self.latitude, self.longitude, self.osm_id, self.area_name_en)
+        return '%s:%s (%s;%s)' % (self.latitude, self.longitude, self.osm_id, self.map_id)
 
 
 class GeoNames(Model):
