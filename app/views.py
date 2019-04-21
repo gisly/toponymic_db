@@ -3,7 +3,7 @@ from flask_appbuilder.models.generic.filters import FilterStartsWith
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder import ModelView
 from app import appbuilder, db
-from .models import Languages, SourceReferences, MotivationTypes, GeoTypes, GeoObjects, GeoNames
+from .models import Languages, SourceReferences, MotivationTypes, GeoTypes, GeoObjects, GeoNames, Maps
 
 
 @appbuilder.app.errorhandler(404)
@@ -207,11 +207,11 @@ class GeoObjectsModelView(ModelView):
                      'osm_id' : 'Object id in OpenStreetMap',
                      'geo_types.geotype_ru': 'Type (Russian)',
                      'geo_types.geotype_en': 'Type (English)',
-                     'area_name_ru' : 'The area which it belongs to (Russian)',
-                     'area_name_en' : 'The area which it belongs to (English)'
+                     'maps.area_name_ru' : 'The area which it belongs to (Russian)',
+                     'maps.area_name_en' : 'The area which it belongs to (English)'
                      }
     list_columns = ['latitude', 'longitude', 'osm_id', 'geo_types.geotype_ru', 'geo_types.geotype_en',
-                    'area_name_ru', 'area_name_en']
+                    'maps.area_name_ru', 'maps.area_name_en']
     base_order = ('latitude', 'asc')
 
     show_fieldsets = [
@@ -221,8 +221,7 @@ class GeoObjectsModelView(ModelView):
                                        'longitude',
                                        'osm_id'
                                        'geo_types',
-                                        'area_name_en',
-                                         'area_name_ru'
+                                        'maps'
                              ]}
                         ),
 
@@ -234,8 +233,7 @@ class GeoObjectsModelView(ModelView):
                         'longitude',
                         'osm_id',
                         'geo_types',
-                        'area_name_en',
-                        'area_name_ru']}
+                        'maps']}
         ),
 
     ]
@@ -247,8 +245,7 @@ class GeoObjectsModelView(ModelView):
                         'longitude',
                         'osm_id',
                         'geo_types',
-                        'area_name_en',
-                        'area_name_ru'
+                        'maps'
                         ]}
         ),
 
@@ -300,6 +297,43 @@ class GeoTypesModelView(ModelView):
 
                      ]
 
+class MapsModelView(ModelView):
+    datamodel = SQLAInterface(Maps)
+    related_views = [GeoObjectsModelView]
+
+    label_columns = {'area_name_ru':'Map description (Russian)',
+                     'area_name_en': 'Map description (English)'
+                     }
+    list_columns = ['area_name_ru', 'area_name_en', ]
+
+
+
+
+    show_fieldsets = [
+                        (
+                            'Summary',
+                            {'fields':['area_name_ru',
+                                       'area_name_en']}
+                        ),
+
+                     ]
+    add_fieldsets = [
+                        (
+                            'Summary',
+                            {'fields': ['area_name_ru',
+                                        'area_name_en']}
+                        ),
+
+                     ]
+
+    edit_fieldsets = [
+                        (
+                            'Summary',
+                            {'fields': ['area_name_ru',
+                                        'area_name_en',]}
+                        ),
+
+                     ]
 
 from flask_appbuilder.charts.views import DirectByChartView, GroupByChartView
 from flask_appbuilder.models.sqla.interface import SQLAInterface
